@@ -1,0 +1,307 @@
+export type Locale = "en" | "es";
+
+export const LOCALES: { id: Locale; label: string }[] = [
+  { id: "en", label: "EN" },
+  { id: "es", label: "ES" },
+];
+
+export const LANGUAGE_KEY = "scotia-prepatent-language";
+
+export function isLocale(value: unknown): value is Locale {
+  return value === "en" || value === "es";
+}
+
+export type RatingKey = "Low" | "Medium" | "High";
+
+export const messages = {
+  en: {
+    language: "Language",
+    prePatentScreening: "Pre-patent screening",
+    confidential: "Confidential",
+    startDisclosure: "Start disclosure",
+    savedSessions: "Saved sessions",
+    howItWorks: "How it works",
+    footerInternal: "Internal use only · The Bank of Nova Scotia",
+    footerHigh: "Ideas that score High proceed to executive sponsorship and IP counsel.",
+    homeEyebrow: "Intellectual property · Internal",
+    homeTitle: "Pre-patent screening for Scotiabank ideas",
+    homeLead:
+      "Capture a confidential invention disclosure, download a PDF record, and let the screening agent recommend whether to strengthen the idea, gather evidence, or proceed to executive sponsorship and IP counsel.",
+    agentName: "Scotia IP Screening Agent",
+    agentTagline: "Low / Medium / High in minutes",
+    weighted: "Weighted",
+    factors: [
+      "Novelty",
+      "How developed the idea is",
+      "Prior public disclosure",
+      "Revenue opportunity",
+      "Helping Scotiabank’s reputation",
+      "Will a competitor want to copy it",
+    ],
+    whenUsed: "When this is used",
+    whenUsedBody:
+      "From the beginning of idea creation — before executive sponsorship, before a patent consultant, and before a patent lawyer. Counsel reviews ideas that have already cleared stages 1–3. The goal is to spend legal time on pre-screened ideas, not every submission.",
+    stages: [
+      {
+        n: "01",
+        title: "Form submission",
+        body: "Complete one confidential invention disclosure as soon as you have a patentable idea — before executive sponsorship or a meeting with counsel.",
+      },
+      {
+        n: "02",
+        title: "Automatic scoring",
+        body: "The screening agent weighs novelty, how developed the idea is, prior public disclosure, revenue opportunity, reputational value, and whether a competitor would copy it.",
+      },
+      {
+        n: "03",
+        title: "Next-step guidance",
+        body: "You receive a Low, Medium, or High rating and a recommended path so legal time is spent only on ideas that clear the screen.",
+      },
+    ],
+    ratingMeans: "What the rating means",
+    ratingLow: "Strengthen the idea, or consider a low-cost public disclosure instead of patenting.",
+    ratingMedium: "Gather more documentation and evidence, then resubmit.",
+    ratingHigh:
+      "This idea has passed the screen. Proceed to executive sponsorship to enter the Bank’s formal process.",
+    ratings: { Low: "Low", Medium: "Medium", High: "High" } as Record<RatingKey, string>,
+    savedIntro:
+      "Continue a disclosure you already started. Sessions stay on this device until you remove them.",
+    loadingSessions: "Loading saved sessions…",
+    noSessions: "No saved sessions yet",
+    noSessionsBody:
+      "Start a disclosure and it will appear here, so you can leave and come back to the same patent.",
+    inProgress: "In progress",
+    continue: "Continue",
+    viewResults: "View results",
+    remove: "Remove",
+    keep: "Keep",
+    requiredAnswers: (filled: number, total: number) => `${filled} of ${total} required answers`,
+    savedOnDevice: "Saved on this device",
+    savedAt: (when: string) => `Saved ${when}`,
+    sectionOf: (step: number, total: number, title: string) => `Section ${step} of ${total} · ${title}`,
+    untitled: "Untitled invention",
+    patentId: (id: string) => `Patent ID ${id}`,
+    loadingDraft: "Loading your draft…",
+    saved: "Saved",
+    draftSaved: "Draft saved on this device",
+    inventionDisclosure: "Invention disclosure",
+    requiredFields: "Please complete the required fields marked with an asterisk before continuing.",
+    back: "Back",
+    downloadPdf: "Download PDF",
+    submitScreening: "Submit for screening",
+    scoring: "Scoring…",
+    submitWeb: "Submit with web search",
+    searchingScoring: "Searching and scoring…",
+    yes: "Yes",
+    no: "No",
+    select: "Select…",
+    affirmationBody:
+      "I (we) affirm that to the best of my (our) knowledge and belief, this invention disclosure describes my (our) original invention/idea, and declare that all of the information provided is complete and correct. To the best of my knowledge, all persons who might legally make claim to ownership are identified in this form.",
+    name: "Name",
+    email: "Email",
+    typedSignature: "Type your name as signature",
+    date: "Date",
+    affirmationHint:
+      "Submit for screening scores from the form only. Submit with web search also checks public patents, products, and news for novelty, prior disclosure, and competitor copy-risk. You can download a PDF of your answers first.",
+    inventorsTitle: "Name, address, residency, and nationality of each contributor",
+    inventorsHint:
+      "List original inventors — people who conceived the idea. Reduction to practice alone does not make someone an inventor. When in doubt, list the contributor and confirm with counsel.",
+    inventorError: "Add at least one inventor name.",
+    inventorN: (n: number) => `Inventor ${n}`,
+    fullName: "Full name",
+    workEmail: "Work email",
+    address: "Address",
+    residency: "Residency",
+    nationality: "Nationality",
+    employee: "Scotiabank employee?",
+    outsideFunding: "University, other company, JV, government, or outside funding?",
+    addInventor: "+ Add another inventor",
+    scoringTitle: "Scoring your disclosure",
+    scoringWait: "This can take up to a minute.",
+    scoringWebWait: "Checking public patents and products. This can take a few minutes.",
+    agentReached: "AI agent reached",
+    agentScoresWeb: "The web-search screening agent returned these scores.",
+    agentScoresForm: "The screening agent returned these scores from the disclosure only.",
+    webUsed: "Web search was used for novelty, prior public disclosure, and competitor copy-risk.",
+    noWeb: "No web search was used.",
+    agentNotReached: "AI agent was not reached",
+    localRulesNote: "These scores came from local rules on this computer, not the screening agent.",
+    error: "Error",
+    noErrorDetails:
+      "No error details were returned. Check OPENAI_API_KEY in .env.local and restart the app.",
+    noSubmission: "No submission found",
+    noSubmissionBody: "Complete and submit a disclosure to receive a six-factor screening result.",
+    goToDisclosure: "Go to disclosure",
+    stage2: "Stage 2 · Automatic scoring",
+    overallScore: (score: number) => `Overall screening score ${score} / 100`,
+    stage3: "Stage 3 · Next step",
+    downloadPdfScores: "Download PDF with scores",
+    editDisclosure: "Edit disclosure",
+    reviewTitle: "Patent Submission Review",
+    reviewBody:
+      "Each score is tagged at the top. Each reason is a bullet tagged with where it came from: AI agent, AI agent with web search, or local rules. Public disclosure is scored so that a cleaner confidentiality record ranks higher.",
+    localRules: "Local rules",
+    aiAgentWeb: "AI agent · web search",
+    aiAgent: "AI agent",
+    factorNames: {
+      novelty: "Novelty",
+      development: "How developed the idea is",
+      disclosure: "Prior public disclosure",
+      revenue: "Revenue opportunity",
+      reputation: "Helping Scotiabank’s reputation",
+      competitor: "Will a competitor want to copy it",
+    } as Record<string, string>,
+    apiError: "Could not reach the scoring API.",
+  },
+  es: {
+    language: "Idioma",
+    prePatentScreening: "Evaluación previa a la patente",
+    confidential: "Confidencial",
+    startDisclosure: "Iniciar divulgación",
+    savedSessions: "Sesiones guardadas",
+    howItWorks: "Cómo funciona",
+    footerInternal: "Uso interno · The Bank of Nova Scotia",
+    footerHigh:
+      "Las ideas con calificación Alta pasan a patrocinio ejecutivo y a la asesoría de PI.",
+    homeEyebrow: "Propiedad intelectual · Interno",
+    homeTitle: "Evaluación previa a la patente para ideas de Scotiabank",
+    homeLead:
+      "Capture una divulgación confidencial de invención, descargue un registro en PDF y deje que el agente de evaluación recomiende reforzar la idea, reunir evidencia o pasar a patrocinio ejecutivo y a la asesoría de PI.",
+    agentName: "Agente de evaluación de PI de Scotia",
+    agentTagline: "Baja / Media / Alta en minutos",
+    weighted: "Ponderado",
+    factors: [
+      "Novedad",
+      "Qué tan desarrollada está la idea",
+      "Divulgación pública previa",
+      "Oportunidad de ingresos",
+      "Ayuda a la reputación de Scotiabank",
+      "Si un competidor querría copiarla",
+    ],
+    whenUsed: "Cuándo se usa",
+    whenUsedBody:
+      "Desde el inicio de la idea — antes del patrocinio ejecutivo, de un consultor de patentes y de un abogado de patentes. La asesoría jurídica revisa ideas que ya superaron las etapas 1 a 3. El objetivo es dedicar tiempo legal a ideas preevaluadas, no a cada envío.",
+    stages: [
+      {
+        n: "01",
+        title: "Envío del formulario",
+        body: "Complete una divulgación confidencial de invención tan pronto como tenga una idea patentable, antes del patrocinio ejecutivo o de una reunión con la asesoría jurídica.",
+      },
+      {
+        n: "02",
+        title: "Puntuación automática",
+        body: "El agente pondera la novedad, el grado de desarrollo, la divulgación pública previa, la oportunidad de ingresos, el valor reputacional y si un competidor querría copiarla.",
+      },
+      {
+        n: "03",
+        title: "Orientación del siguiente paso",
+        body: "Recibe una calificación Baja, Media o Alta y una ruta recomendada para que el tiempo legal se use solo en ideas que superan el filtro.",
+      },
+    ],
+    ratingMeans: "Qué significa la calificación",
+    ratingLow:
+      "Refuerce la idea, o considere una divulgación pública de bajo costo en lugar de patentar.",
+    ratingMedium: "Reúna más documentación y evidencia, y vuelva a enviar.",
+    ratingHigh:
+      "Esta idea superó el filtro. Pase a patrocinio ejecutivo para entrar al proceso formal del Banco.",
+    ratings: { Low: "Baja", Medium: "Media", High: "Alta" } as Record<RatingKey, string>,
+    savedIntro:
+      "Continúe una divulgación que ya empezó. Las sesiones permanecen en este dispositivo hasta que las elimine.",
+    loadingSessions: "Cargando sesiones guardadas…",
+    noSessions: "Aún no hay sesiones guardadas",
+    noSessionsBody:
+      "Inicie una divulgación y aparecerá aquí, para que pueda salir y volver a la misma patente.",
+    inProgress: "En curso",
+    continue: "Continuar",
+    viewResults: "Ver resultados",
+    remove: "Eliminar",
+    keep: "Conservar",
+    requiredAnswers: (filled: number, total: number) =>
+      `${filled} de ${total} respuestas obligatorias`,
+    savedOnDevice: "Guardado en este dispositivo",
+    savedAt: (when: string) => `Guardado ${when}`,
+    sectionOf: (step: number, total: number, title: string) =>
+      `Sección ${step} de ${total} · ${title}`,
+    untitled: "Invención sin título",
+    patentId: (id: string) => `ID de patente ${id}`,
+    loadingDraft: "Cargando su borrador…",
+    saved: "Guardado",
+    draftSaved: "Borrador guardado en este dispositivo",
+    inventionDisclosure: "Divulgación de invención",
+    requiredFields:
+      "Complete los campos obligatorios marcados con un asterisco antes de continuar.",
+    back: "Atrás",
+    downloadPdf: "Descargar PDF",
+    submitScreening: "Enviar a evaluación",
+    scoring: "Evaluando…",
+    submitWeb: "Enviar con búsqueda web",
+    searchingScoring: "Buscando y evaluando…",
+    yes: "Sí",
+    no: "No",
+    select: "Seleccionar…",
+    affirmationBody:
+      "Afirmo (afirmamos) que, a mi (nuestro) leal saber y entender, esta divulgación de invención describe mi (nuestra) invención/idea original, y declaro que toda la información es completa y correcta. A mi leal saber, todas las personas que podrían reclamar legalmente la titularidad están identificadas en este formulario.",
+    name: "Nombre",
+    email: "Correo",
+    typedSignature: "Escriba su nombre como firma",
+    date: "Fecha",
+    affirmationHint:
+      "Enviar a evaluación usa solo el formulario. Enviar con búsqueda web también revisa patentes, productos y noticias públicas para novedad, divulgación previa y riesgo de copia. Puede descargar un PDF de sus respuestas primero.",
+    inventorsTitle: "Nombre, dirección, residencia y nacionalidad de cada contribuyente",
+    inventorsHint:
+      "Liste a los inventores originales: quienes concibieron la idea. La mera reducción a la práctica no hace inventor a alguien. En caso de duda, incluya a la persona y confirme con la asesoría jurídica.",
+    inventorError: "Agregue al menos un nombre de inventor.",
+    inventorN: (n: number) => `Inventor ${n}`,
+    fullName: "Nombre completo",
+    workEmail: "Correo de trabajo",
+    address: "Dirección",
+    residency: "Residencia",
+    nationality: "Nacionalidad",
+    employee: "¿Empleado de Scotiabank?",
+    outsideFunding:
+      "¿Universidad, otra empresa, joint venture, gobierno o financiamiento externo?",
+    addInventor: "+ Agregar otro inventor",
+    scoringTitle: "Evaluando su divulgación",
+    scoringWait: "Esto puede tardar hasta un minuto.",
+    scoringWebWait:
+      "Revisando patentes y productos públicos. Esto puede tardar unos minutos.",
+    agentReached: "Agente de IA contactado",
+    agentScoresWeb: "El agente de evaluación con búsqueda web devolvió estas puntuaciones.",
+    agentScoresForm: "El agente de evaluación devolvió estas puntuaciones solo a partir de la divulgación.",
+    webUsed:
+      "Se usó búsqueda web para novedad, divulgación pública previa y riesgo de copia por competidores.",
+    noWeb: "No se usó búsqueda web.",
+    agentNotReached: "No se contactó al agente de IA",
+    localRulesNote:
+      "Estas puntuaciones provienen de reglas locales en este equipo, no del agente de evaluación.",
+    error: "Error",
+    noErrorDetails:
+      "No se devolvieron detalles del error. Revise OPENAI_API_KEY en .env.local y reinicie la aplicación.",
+    noSubmission: "No se encontró un envío",
+    noSubmissionBody:
+      "Complete y envíe una divulgación para recibir un resultado de evaluación de seis factores.",
+    goToDisclosure: "Ir a la divulgación",
+    stage2: "Etapa 2 · Puntuación automática",
+    overallScore: (score: number) => `Puntuación general ${score} / 100`,
+    stage3: "Etapa 3 · Siguiente paso",
+    downloadPdfScores: "Descargar PDF con puntuaciones",
+    editDisclosure: "Editar divulgación",
+    reviewTitle: "Revisión de la solicitud de patente",
+    reviewBody:
+      "Cada puntuación está etiquetada arriba. Cada motivo es una viñeta con su origen: agente de IA, agente de IA con búsqueda web o reglas locales. La divulgación pública se puntúa de modo que un mejor registro de confidencialidad reciba una calificación más alta.",
+    localRules: "Reglas locales",
+    aiAgentWeb: "Agente de IA · búsqueda web",
+    aiAgent: "Agente de IA",
+    factorNames: {
+      novelty: "Novedad",
+      development: "Qué tan desarrollada está la idea",
+      disclosure: "Divulgación pública previa",
+      revenue: "Oportunidad de ingresos",
+      reputation: "Ayuda a la reputación de Scotiabank",
+      competitor: "Si un competidor querría copiarla",
+    } as Record<string, string>,
+    apiError: "No se pudo contactar la API de evaluación.",
+  },
+} as const;
+
+export type Messages = (typeof messages)["en"];
