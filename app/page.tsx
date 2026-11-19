@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/Header";
-import { ScotiaMark } from "@/components/Logo";
-import { SavedSessions } from "@/components/SavedSessions";
+import { PatentSearch } from "@/components/PatentSearch";
 import { useLanguage } from "@/components/LanguageProvider";
 
 export default function HomePage() {
@@ -14,7 +13,7 @@ export default function HomePage() {
       <SiteHeader />
       <main>
         <section className="border-b border-scotia-line bg-white">
-          <div className="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:py-24">
+          <div className="mx-auto max-w-6xl px-6 py-16 lg:py-24">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-scotia-red">
                 {t.homeEyebrow}
@@ -33,45 +32,16 @@ export default function HomePage() {
                   {t.startDisclosure}
                 </Link>
                 <a
-                  href="#saved"
-                  className="rounded-full border border-scotia-ink px-6 py-3 text-sm font-semibold text-scotia-ink hover:bg-scotia-paper"
-                >
-                  {t.savedSessions}
-                </a>
-                <a
                   href="#how"
                   className="rounded-full border border-scotia-ink px-6 py-3 text-sm font-semibold text-scotia-ink hover:bg-scotia-paper"
                 >
                   {t.howItWorks}
                 </a>
               </div>
-            </div>
-            <div className="rounded-2xl border border-scotia-line bg-scotia-mist p-8">
-              <div className="flex items-center gap-3">
-                <ScotiaMark size={44} />
-                <div>
-                  <p className="font-semibold text-scotia-ink">{t.agentName}</p>
-                  <p className="text-sm text-scotia-muted">{t.agentTagline}</p>
-                </div>
-              </div>
-              <ul className="mt-8 space-y-3">
-                {t.factors.map((factor) => (
-                  <li
-                    key={factor}
-                    className="flex items-center justify-between border-b border-scotia-line pb-3 text-sm last:border-0"
-                  >
-                    <span className="text-scotia-ink">{factor}</span>
-                    <span className="text-xs font-medium uppercase tracking-wider text-scotia-muted">
-                      {t.weighted}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <PatentSearch />
             </div>
           </div>
         </section>
-
-        <SavedSessions />
 
         <section id="how" className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight text-scotia-ink">{t.whenUsed}</h2>

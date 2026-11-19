@@ -224,17 +224,37 @@ export function DisclosureWizard() {
         </div>
       </div>
 
+      {patentId ? (
+        step === 0 ? (
+          <div className="mb-6 rounded-2xl border-2 border-scotia-red bg-scotia-red/5 px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-scotia-red">
+              {t.patentIdLabel}
+            </p>
+            <p className="mt-1 font-mono text-4xl font-bold tracking-[0.18em] text-scotia-ink sm:text-5xl">
+              {patentId}
+            </p>
+            <p className="mt-3 text-sm font-semibold leading-relaxed text-scotia-red">
+              {t.patentIdKeep}
+            </p>
+          </div>
+        ) : (
+          <div className="mb-6 rounded-2xl border border-scotia-line bg-white px-6 py-4">
+            <p className="text-sm text-scotia-ink">
+              <span className="font-semibold">{t.patentIdLabel}:</span>{" "}
+              <span className="font-mono tracking-wide">{patentId}</span>
+            </p>
+            <p className="mt-1 text-sm text-scotia-ink">
+              <span className="font-semibold">{t.patentTitleLabel}:</span>{" "}
+              {(typeof state.answers.title === "string" && state.answers.title.trim()) || t.untitled}
+            </p>
+          </div>
+        )
+      ) : null}
+
       <div className="rounded-2xl border border-scotia-line bg-white p-6 sm:p-8">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-scotia-red">
-            {t.inventionDisclosure}
-          </p>
-          {patentId ? (
-            <span className="rounded-full bg-scotia-paper px-2.5 py-0.5 font-mono text-[11px] font-semibold tracking-wide text-scotia-ink">
-              {t.patentId(patentId)}
-            </span>
-          ) : null}
-        </div>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-scotia-red">
+          {t.inventionDisclosure}
+        </p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-scotia-ink">
           {section.title}
         </h1>

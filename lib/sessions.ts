@@ -1,6 +1,8 @@
 import { SECTIONS } from "./questions";
-import { loadState, saveState } from "./storage";
+import { RESULT_KEY, saveState } from "./storage";
 import { STORAGE_KEY, type DisclosureState, type Rating, type ScreeningResult } from "./types";
+
+export type ReviewStatus = "pending" | "approved" | "denied";
 
 export interface SavedSession {
   id: string;
@@ -9,14 +11,19 @@ export interface SavedSession {
   updatedAt: string;
   step: number;
   status: "draft" | "screened";
+  review?: ReviewStatus;
   overall?: Rating;
   overallScore?: number;
   state: DisclosureState;
   result?: ScreeningResult;
 }
 
-const SESSIONS_KEY = "scotia-prepatent-sessions-v1";
-const MIGRATED_KEY = "scotia-prepatent-sessions-migrated";
+const SESSIONS_KEY = "scotia-prepatent-sessions-v2";
+const RESET_KEY = "scotia-prepatent-id-reset-v2";
+const LEGACY_SESSION_KEYS = [
+  "scotia-prepatent-sessions-v1",
+  "scotia-prepatent-sessions-migrated",
+];
 
 export function newSessionId(): string {
   return typeof crypto !== "undefined" && crypto.randomUUID
@@ -24,17 +31,16 @@ export function newSessionId(): string {
     : `session-${Date.now()}`;
 }
 
-const PATENT_ID_DIGITS = 8;
-const NUMERIC_PATENT_ID = /^\d{8}$/;
+const PATENT_ID_DIGITS = 6;
+const NUMERIC_PATENT_ID = /^\d{6}$/;
 
 function randomDigitId(): string {
-  const min = 10 ** (PATENT_ID_DIGITS - 1);
-  const max = 10 ** PATENT_ID_DIGITS;
+  const span = 10 ** PATENT_ID_DIGITS;
   const value =
     typeof crypto !== "undefined" && crypto.getRandomValues
-      ? crypto.getRandomValues(new Uint32Array(1))[0] % (max - min) + min
-      : Math.floor(Math.random() * (max - min) + min);
-  return String(value);
+      ? crypto.getRandomValues(new Uint32Array(1))[0] % span
+      : Math.floor(Math.random() * span);
+  return String(value).padStart(PATENT_ID_DIGITS, "0");
 }
 
 export function nextPatentId(sessions: SavedSession[]): string {
@@ -100,33 +106,23 @@ function writeSessions(sessions: SavedSession[]) {
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sortSessions(sessions)));
 }
 
-function migrateLegacyOnce() {
-  if (localStorage.getItem(MIGRATED_KEY) === "1") return;
-  const existing = localStorage.getItem(SESSIONS_KEY);
-  localStorage.setItem(MIGRATED_KEY, "1");
-  if (existing) return;
-  if (!localStorage.getItem(STORAGE_KEY)) return;
+function resetStoredPatentsOnce() {
+  if (localStorage.getItem(RESET_KEY) === "1") return;
+  for (const key of LEGACY_SESSION_KEYS) localStorage.removeItem(key);
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(RESULT_KEY);
   try {
-    const now = new Date().toISOString();
-    const session: SavedSession = {
-      id: newSessionId(),
-      patentId: nextPatentId([]),
-      createdAt: now,
-      updatedAt: now,
-      step: 0,
-      status: "draft",
-      state: loadState(),
-    };
-    writeSessions([session]);
+    sessionStorage.removeItem("scotia-prepatent-pending-new");
   } catch {
-    localStorage.removeItem(MIGRATED_KEY);
+    // sessionStorage can be unavailable in some embedded browsers
   }
+  localStorage.setItem(RESET_KEY, "1");
 }
 
 export function listSessions(): SavedSession[] {
   if (typeof window === "undefined") return [];
   try {
-    migrateLegacyOnce();
+    resetStoredPatentsOnce();
     const raw = localStorage.getItem(SESSIONS_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as SavedSession[];
@@ -174,6 +170,7 @@ export function saveSessionProgress(input: {
       step: input.step,
       state: input.state,
       status: editedAfterScore ? "draft" : existing.status,
+      review: editedAfterScore ? undefined : existing.review,
       overall: editedAfterScore ? undefined : existing.overall,
       overallScore: editedAfterScore ? undefined : existing.overallScore,
       result: editedAfterScore ? undefined : existing.result,
@@ -200,6 +197,7 @@ export function saveSessionResult(
     updatedAt: now,
     step,
     status: "screened",
+    review: "pending",
     overall: result.overall,
     overallScore: result.overallScore,
     state,
@@ -211,4 +209,27 @@ export function saveSessionResult(
 
 export function deleteSession(id: string) {
   writeSessions(listSessions().filter((session) => session.id !== id));
+}
+
+export function findSessionByPatentId(patentId: string): SavedSession | null {
+  const id = patentId.trim();
+  if (!NUMERIC_PATENT_ID.test(id)) return null;
+  return listSessions().find((session) => session.patentId === id) ?? null;
+}
+
+export function sessionPath(session: SavedSession): string {
+  if (session.status === "screened" && session.result) {
+    return `/results?session=${session.id}`;
+  }
+  return `/apply?session=${session.id}`;
+}
+
+export function setSessionReview(id: string, review: ReviewStatus) {
+  const sessions = listSessions();
+  const index = sessions.findIndex((session) => session.id === id);
+  if (index === -1) return;
+  const existing = sessions[index];
+  if (existing.status !== "screened") return;
+  sessions[index] = { ...existing, review, updatedAt: new Date().toISOString() };
+  writeSessions(sessions);
 }

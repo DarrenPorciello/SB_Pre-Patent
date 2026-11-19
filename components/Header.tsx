@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ScotiaLogo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "./LanguageProvider";
+import { useAdmin } from "./AdminProvider";
 
 export function SiteHeader({ compact = false }: { compact?: boolean }) {
   const { t } = useLanguage();
+  const { isAdmin } = useAdmin();
+  const pathname = usePathname();
 
   return (
     <header className="border-b border-scotia-line bg-white">
@@ -17,6 +21,18 @@ export function SiteHeader({ compact = false }: { compact?: boolean }) {
           <p className="hidden text-sm text-scotia-muted sm:block">{t.prePatentScreening}</p>
         </div>
         <div className="flex items-center gap-3">
+          {isAdmin && (
+            <Link
+              href="/patents"
+              className={`rounded-full px-3 py-1 text-sm font-semibold ${
+                pathname === "/patents"
+                  ? "bg-scotia-ink text-white"
+                  : "text-scotia-ink hover:bg-scotia-mist"
+              }`}
+            >
+              {t.existingPatents}
+            </Link>
+          )}
           <LanguageToggle />
           <span className="rounded-full border border-scotia-red/20 bg-scotia-red/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-scotia-red">
             {t.confidential}
