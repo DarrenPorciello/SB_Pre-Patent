@@ -1,5 +1,3 @@
-import { EXAMPLE_DISCLOSURE } from "./example";
-
 export type FieldType =
   | "text"
   | "textarea"
@@ -78,8 +76,16 @@ export function blankInventor(): Inventor {
   };
 }
 
+export function emptyState(): DisclosureState {
+  return {
+    answers: {},
+    inventors: [blankInventor()],
+    signature: { name: "", email: "", typedSignature: "", date: "" },
+  };
+}
+
 export function defaultState(): DisclosureState {
-  return structuredClone(EXAMPLE_DISCLOSURE);
+  return emptyState();
 }
 
 export type Rating = "Low" | "Medium" | "High";

@@ -8,12 +8,12 @@ const ADMIN_KEY = "scotia-prepatent-admin";
 const AdminContext = createContext<{
   ready: boolean;
   isAdmin: boolean;
-  login: (username: string, password: string) => boolean;
+  enterAdmin: () => void;
   logout: () => void;
 }>({
   ready: false,
   isAdmin: false,
-  login: () => false,
+  enterAdmin: () => {},
   logout: () => {},
 });
 
@@ -27,11 +27,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setReady(true);
   }, []);
 
-  const login = (username: string, password: string) => {
-    if (username !== "username" || password !== "password") return false;
+  const enterAdmin = () => {
     localStorage.setItem(ADMIN_KEY, "1");
     setIsAdmin(true);
-    return true;
   };
 
   const logout = () => {
@@ -40,7 +38,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AdminContext.Provider value={{ ready, isAdmin, login, logout }}>
+    <AdminContext.Provider value={{ ready, isAdmin, enterAdmin, logout }}>
       {children}
     </AdminContext.Provider>
   );

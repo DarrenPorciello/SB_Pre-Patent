@@ -8,7 +8,6 @@ import { SECTIONS } from "@/lib/questions";
 import { localizedSections } from "@/lib/question-i18n";
 import { useLanguage } from "./LanguageProvider";
 import { downloadDisclosurePdf } from "@/lib/pdf";
-import { scoreDisclosureApplication } from "@/lib/scoring";
 import {
   getSession,
   listSessions,
@@ -17,7 +16,8 @@ import {
   saveSessionResult,
 } from "@/lib/sessions";
 import { RESULT_KEY } from "@/lib/storage";
-import { defaultState, type DisclosureState } from "@/lib/types";
+import { EXAMPLE_DISCLOSURE } from "@/lib/example";
+import { defaultState, emptyState, type DisclosureState } from "@/lib/types";
 import { ScoringLoader } from "./ScoringLoader";
 
 const NEW_LOCK = "scotia-prepatent-pending-new";
@@ -40,7 +40,9 @@ export function DisclosureWizard() {
   const [ready, setReady] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
-  const [submitting, setSubmitting] = useState<"none" | "disclosure" | "web">("none");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [useFraudExample, setUseFraudExample] = useState(false);
 
   useEffect(() => {
     const requested = searchParams.get("session");
@@ -144,23 +146,28 @@ export function DisclosureWizard() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const submit = async (webSearch: boolean) => {
+  const submit = async () => {
     if (missingInSection.length) {
       setErrors(missingInSection);
       return;
     }
-    setSubmitting(webSearch ? "web" : "disclosure");
+    setSubmitting(true);
+    setSubmitError("");
     try {
       const response = await fetch("/api/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ state, webSearch }),
+        body: JSON.stringify({ state }),
       });
+      const payload = await response.json().catch(() => null);
       if (!response.ok) {
-        const detail = await response.text();
-        throw new Error(detail.slice(0, 400) || `Screening failed (${response.status})`);
+        const detail =
+          payload && typeof payload.error === "string"
+            ? payload.error
+            : `Screening failed (${response.status})`;
+        throw new Error(detail.slice(0, 400));
       }
-      const result = await response.json();
+      const result = payload;
       if (sessionId) saveSessionResult(sessionId, state, step, result);
       const savedPatentId = sessionId ? getSession(sessionId)?.patentId ?? patentId : patentId;
       sessionStorage.setItem(
@@ -169,20 +176,9 @@ export function DisclosureWizard() {
       );
       router.push(sessionId ? `/results?session=${sessionId}` : "/results");
     } catch (error) {
-      const result = {
-        ...scoreDisclosureApplication(state),
-        scoredBy: "local-rules" as const,
-        searchMode: webSearch ? ("web" as const) : ("disclosure-only" as const),
-        agentError:
-          error instanceof Error ? error.message : t.apiError,
-      };
-      if (sessionId) saveSessionResult(sessionId, state, step, result);
-      const savedPatentId = sessionId ? getSession(sessionId)?.patentId ?? patentId : patentId;
-      sessionStorage.setItem(
-        RESULT_KEY,
-        JSON.stringify({ state, result, sessionId, patentId: savedPatentId }),
-      );
-      router.push(sessionId ? `/results?session=${sessionId}` : "/results");
+      setSubmitError(error instanceof Error ? error.message : t.scoringFailed);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -192,7 +188,7 @@ export function DisclosureWizard() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
-      {submitting !== "none" && <ScoringLoader overlay webSearch={submitting === "web"} />}
+      {submitting && <ScoringLoader overlay />}
       <div className="mb-8">
         <div className="mb-3 flex items-center justify-between text-xs text-scotia-muted">
           <span>{section.eyebrow}</span>
@@ -260,6 +256,23 @@ export function DisclosureWizard() {
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-scotia-muted">{section.description}</p>
 
+        {section.id === "getting-started" ? (
+          <label className="mt-6 flex items-center gap-3 rounded-xl border border-scotia-line bg-scotia-mist px-4 py-3">
+            <input
+              type="checkbox"
+              checked={useFraudExample}
+              onChange={(event) => {
+                const checked = event.target.checked;
+                setUseFraudExample(checked);
+                setState(checked ? structuredClone(EXAMPLE_DISCLOSURE) : emptyState());
+                setErrors([]);
+              }}
+              className="h-4 w-4 accent-scotia-red"
+            />
+            <span className="text-sm font-semibold text-scotia-ink">{t.fraudExample}</span>
+          </label>
+        ) : null}
+
         <div className="mt-8 space-y-8">
           {section.questions.map((question) => (
             <Field
@@ -293,6 +306,7 @@ export function DisclosureWizard() {
             {t.requiredFields}
           </p>
         )}
+        {submitError ? <p className="mt-6 text-sm text-scotia-red">{submitError}</p> : null}
 
         <div className="mt-8 flex flex-col-reverse gap-3 border-t border-scotia-line pt-6 sm:flex-row sm:items-center sm:justify-between">
           <button
@@ -314,24 +328,14 @@ export function DisclosureWizard() {
               </button>
             )}
             {isLast ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => submit(false)}
-                  disabled={submitting !== "none"}
-                  className="rounded-full border border-scotia-ink px-5 py-2.5 text-sm font-semibold text-scotia-ink hover:bg-scotia-paper disabled:opacity-60"
-                >
-                  {submitting === "disclosure" ? t.scoring : t.submitScreening}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => submit(true)}
-                  disabled={submitting !== "none"}
-                  className="rounded-full bg-scotia-red px-5 py-2.5 text-sm font-semibold text-white hover:bg-scotia-red-dark disabled:opacity-60"
-                >
-                  {submitting === "web" ? t.searchingScoring : t.submitWeb}
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={submit}
+                disabled={submitting}
+                className="rounded-full bg-scotia-red px-5 py-2.5 text-sm font-semibold text-white hover:bg-scotia-red-dark disabled:opacity-60"
+              >
+                {submitting ? t.searchingScoring : t.submitScreening}
+              </button>
             ) : (
               <button
                 type="button"

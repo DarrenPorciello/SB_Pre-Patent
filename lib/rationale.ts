@@ -21,7 +21,7 @@ function normalizeSource(value: unknown, webFactor: boolean): PointSource {
   if (raw.includes("web") || raw.includes("search") || raw === "ai-agent-web") {
     return "ai-agent-web";
   }
-  if (raw.includes("local") || raw.includes("rule")) return "local-rules";
+  if (raw.includes("local") || raw.includes("rule")) return "ai-agent";
   if (webFactor && (raw.includes("web") || raw === "search")) return "ai-agent-web";
   return "ai-agent";
 }
@@ -44,7 +44,7 @@ function inferSource(text: string, webFactor: boolean, fallback: PointSource): P
 export function parseAgentPoints(
   raw: unknown,
   webFactor: boolean,
-  fallback: RationalePoint[],
+  fallback: RationalePoint[] = [],
 ): RationalePoint[] {
   const defaultSource: PointSource = "ai-agent";
 

@@ -2,13 +2,7 @@
 
 import { useLanguage } from "./LanguageProvider";
 
-export function ScoringLoader({
-  overlay = false,
-  webSearch = false,
-}: {
-  overlay?: boolean;
-  webSearch?: boolean;
-}) {
+export function ScoringLoader({ overlay = false }: { overlay?: boolean }) {
   const { t } = useLanguage();
   const card = (
     <div className="w-full max-w-md rounded-2xl border border-scotia-line bg-white px-8 py-10 text-center shadow-card">
@@ -23,7 +17,7 @@ export function ScoringLoader({
       </p>
       <h1 className="mt-3 text-2xl font-semibold text-scotia-ink">{t.scoringTitle}</h1>
       <p className="mt-2 text-sm text-scotia-muted">
-        {webSearch ? t.scoringWebWait : t.scoringWait}
+        {t.scoringWebWait}
       </p>
     </div>
   );

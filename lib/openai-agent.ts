@@ -1,21 +1,11 @@
-import {
-  PRE_PATENT_AGENT_INSTRUCTIONS,
-  PRE_PATENT_WEB_AGENT_INSTRUCTIONS,
-} from "./agent-instructions";
+import { PRE_PATENT_WEB_AGENT_INSTRUCTIONS } from "./agent-instructions";
 import { formatDisclosureForAgent } from "./format-disclosure";
-import { parseAgentPoints, joinPoints, pointsFromText } from "./rationale";
-import { clamp, ratingFromScore, scoreDisclosureApplication } from "./scoring";
+import { parseAgentPoints, joinPoints } from "./rationale";
+import { clamp, ratingFromScore } from "./scoring";
 import type { DisclosureState, FactorResult, Rating, ScreeningResult, SearchMode } from "./types";
+import { FACTOR_WEIGHTS } from "./weights";
 
 const WEB_SEARCH_FACTORS = new Set(["novelty", "disclosure", "competitor"]);
-const FACTOR_WEIGHTS: Record<string, number> = {
-  novelty: 0.24,
-  development: 0.14,
-  disclosure: 0.22,
-  revenue: 0.16,
-  reputation: 0.1,
-  competitor: 0.14,
-};
 
 function recomputeOverall(factors: FactorResult[]): { overallScore: number; overall: Rating } {
   let overallScore = factors.reduce(
@@ -98,32 +88,16 @@ function normalizeAgentResult(
     }
   }
 
-  const localResult = scoreDisclosureApplication(state);
-  const localFactors = localResult.factors;
-  const factors: FactorResult[] = FACTOR_META.map((meta) => {
-    const local = localFactors.find((factor) => factor.id === meta.id);
-    const useLocal =
-      searchMode === "web" && !WEB_SEARCH_FACTORS.has(meta.id);
-    if (useLocal && local) {
-      return {
-        ...local,
-        source: "local-rules",
-        reasonSource: "local-rules",
-        usedWebSearch: false,
-        points: local.points?.length
-          ? local.points
-          : pointsFromText(local.rationale, "local-rules"),
-      };
-    }
+  const missing = FACTOR_META.filter((meta) => !byId.has(meta.id));
+  if (missing.length) {
+    throw new Error(`Agent did not score every category (${missing.map((item) => item.id).join(", ")}).`);
+  }
 
+  const factors: FactorResult[] = FACTOR_META.map((meta) => {
     const row = byId.get(meta.id) ?? {};
     const score = clamp(Number(row.score) || 0);
     const webFactor = searchMode === "web" && WEB_SEARCH_FACTORS.has(meta.id);
-    const localPoints = local?.points?.length
-      ? local.points
-      : pointsFromText(local?.rationale ?? "", "local-rules");
-    const points = parseAgentPoints(row.rationale ?? row.points, webFactor, localPoints);
-    const fromAgent = points.some((point) => point.source !== "local-rules");
+    const points = parseAgentPoints(row.rationale ?? row.points, webFactor);
     return {
       id: meta.id,
       name: typeof row.name === "string" && row.name ? row.name : meta.name,
@@ -131,16 +105,15 @@ function normalizeAgentResult(
       rating: asRating(row.rating, score),
       rationale: joinPoints(points),
       points,
-      source: "ai-agent",
-      reasonSource: fromAgent ? "ai-agent" : "local-rules",
-      usedWebSearch: webFactor,
+      source: "ai-agent" as const,
+      reasonSource: "ai-agent" as const,
+      usedWebSearch: webFactor && points.some((point) => point.source === "ai-agent-web"),
     };
   });
 
-  const mixed = searchMode === "web" || !data.overallScore;
   const computed = recomputeOverall(factors);
-  const overallScore = mixed ? computed.overallScore : clamp(Number(data.overallScore) || computed.overallScore);
-  const overall = mixed ? computed.overall : asRating(data.overall, overallScore);
+  const overallScore = data.overallScore == null ? computed.overallScore : clamp(Number(data.overallScore) || computed.overallScore);
+  const overall = asRating(data.overall, overallScore);
   const fallback = NEXT_BY_RATING[overall];
   const title =
     (typeof state.answers.title === "string" && state.answers.title) || "this idea";
@@ -281,42 +254,32 @@ async function createAgentSession(
   });
 }
 
-export async function scoreWithOpenAIAgent(
-  state: DisclosureState,
-  webSearch = false,
-): Promise<ScreeningResult> {
+export async function scoreWithOpenAIAgent(state: DisclosureState): Promise<ScreeningResult> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY is missing.");
   }
 
-  const searchMode: SearchMode = webSearch ? "web" : "disclosure-only";
-  const input = formatDisclosureForAgent(state, webSearch);
-  const webTool = {
-    type: "web_search",
-    mode: "live",
-    context_size: "medium",
+  const searchMode: SearchMode = "web";
+  const input = formatDisclosureForAgent(state);
+  const inlineAgent = {
+    model: process.env.OPENAI_WEB_MODEL?.trim() || process.env.OPENAI_MODEL?.trim() || "gpt-6-astra",
+    instructions: PRE_PATENT_WEB_AGENT_INSTRUCTIONS,
+    tools: [
+      {
+        type: "web_search",
+        mode: "live",
+        context_size: "medium",
+      },
+    ],
   };
-  const inlineAgent = webSearch
-    ? {
-        model: process.env.OPENAI_WEB_MODEL?.trim() || process.env.OPENAI_MODEL?.trim() || "gpt-6-astra",
-        instructions: PRE_PATENT_WEB_AGENT_INSTRUCTIONS,
-        tools: [webTool],
-      }
-    : {
-        model: process.env.OPENAI_MODEL?.trim() || "gpt-5.5",
-        instructions: PRE_PATENT_AGENT_INSTRUCTIONS,
-        tools: [] as unknown[],
-      };
   const base = {
     environment: { type: "none" },
     stream: true,
     input,
   };
 
-  const agentId = webSearch
-    ? process.env.OPENAI_WEB_AGENT_ID?.trim()
-    : process.env.OPENAI_AGENT_ID?.trim();
+  const agentId = process.env.OPENAI_WEB_AGENT_ID?.trim() || process.env.OPENAI_AGENT_ID?.trim();
   let response: Response | null = null;
 
   if (agentId) {
@@ -343,15 +306,3 @@ export async function scoreWithOpenAIAgent(
   return normalizeAgentResult(extractJsonObject(text), state, searchMode);
 }
 
-export function localScore(
-  state: DisclosureState,
-  agentError?: string,
-  searchMode: SearchMode = "disclosure-only",
-): ScreeningResult {
-  return {
-    ...scoreDisclosureApplication(state),
-    scoredBy: "local-rules",
-    searchMode,
-    agentError,
-  };
-}

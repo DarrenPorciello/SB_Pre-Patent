@@ -44,7 +44,7 @@ export default function HomePage() {
         </section>
 
         <section id="how" className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-2xl font-semibold tracking-tight text-scotia-ink">{t.whenUsed}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-scotia-ink">{t.howItWorks}</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-scotia-muted">{t.whenUsedBody}</p>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {t.stages.map((stage) => (

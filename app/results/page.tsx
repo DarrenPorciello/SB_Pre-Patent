@@ -12,6 +12,7 @@ import { displayPoints } from "@/lib/rationale";
 import { useLanguage } from "@/components/LanguageProvider";
 import type { Messages } from "@/lib/i18n";
 import type { PointSource } from "@/lib/types";
+import { factorWeightPercent } from "@/lib/weights";
 
 type Payload = {
   state: DisclosureState;
@@ -250,11 +251,7 @@ export default function ResultsPage() {
 
             <div className="rounded-2xl border border-scotia-line bg-white p-8">
               <h2 className="text-lg font-semibold text-scotia-ink">Patent Submission Review</h2>
-              <p className="mt-1 text-sm text-scotia-muted">
-                Each score is tagged at the top. Each reason is a bullet tagged with where it came
-                from: AI agent, AI agent with web search, or local rules. Public disclosure is scored
-                so that a cleaner confidentiality record ranks higher.
-              </p>
+              <p className="mt-1 text-sm text-scotia-muted">{t.weightsNote}</p>
               <ul className="mt-8 space-y-6">
                 {result.factors.map((factor) => {
                   const origin = factorOrigin(factor, result.scoredBy, t);
@@ -264,6 +261,9 @@ export default function ResultsPage() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex min-w-0 flex-wrap items-center gap-2">
                         <p className="text-sm font-medium text-scotia-ink">{factor.name}</p>
+                        <span className="text-xs text-scotia-muted">
+                          {t.weightOfOverall(factorWeightPercent(factor.id))}
+                        </span>
                         <span
                           className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${origin.className}`}
                         >

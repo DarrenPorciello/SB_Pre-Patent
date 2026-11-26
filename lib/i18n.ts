@@ -20,7 +20,7 @@ export const messages = {
     confidential: "Confidential",
     startDisclosure: "Start disclosure",
     savedSessions: "Saved sessions",
-    howItWorks: "How it works",
+    howItWorks: "How it Works",
     footerInternal: "Internal use only · The Bank of Nova Scotia",
     footerHigh: "Ideas that score High proceed to executive sponsorship and IP counsel.",
     homeEyebrow: "Intellectual property · Internal",
@@ -40,7 +40,7 @@ export const messages = {
     ],
     whenUsed: "When this is used",
     whenUsedBody:
-      "From the beginning of idea creation — before executive sponsorship, before a patent consultant, and before a patent lawyer. Counsel reviews ideas that have already cleared stages 1–3. The goal is to spend legal time on pre-screened ideas, not every submission.",
+      "Submit a confidential invention disclosure. The screening agent scores it and tells you whether to strengthen the idea, gather more evidence, or proceed to executive sponsorship.",
     stages: [
       {
         n: "01",
@@ -108,17 +108,16 @@ export const messages = {
     loading: "Loading…",
     noPatents: "No patents yet",
     noPatentsBody: "Patents created in this browser appear here with their IDs.",
-    adminTitle: "Admin sign in",
-    adminUsername: "Username",
-    adminPassword: "Password",
-    adminSignIn: "Sign in",
-    adminInvalid: "That username or password is incorrect.",
     adminClose: "Close",
-    openAdmin: "Admin sign in",
+    openAdmin: "Enter admin mode",
     returnToUser: "Return to user mode",
+    enterAdminTitle: "Become an admin?",
+    enterAdminConfirm: "Enter admin mode",
+    enterAdminCancel: "Cancel",
     exitAdminTitle: "Exit admin mode?",
     exitAdminConfirm: "Exit admin mode",
     exitAdminStay: "Stay in admin mode",
+    fraudExample: "Spotting connected fraud",
     loadingDraft: "Loading your draft…",
     saved: "Saved",
     draftSaved: "Draft saved on this device",
@@ -128,7 +127,6 @@ export const messages = {
     downloadPdf: "Download PDF",
     submitScreening: "Submit for screening",
     scoring: "Scoring…",
-    submitWeb: "Submit with web search",
     searchingScoring: "Searching and scoring…",
     yes: "Yes",
     no: "No",
@@ -140,7 +138,7 @@ export const messages = {
     typedSignature: "Type your name as signature",
     date: "Date",
     affirmationHint:
-      "Submit for screening scores from the form only. Submit with web search also checks public patents, products, and news for novelty, prior disclosure, and competitor copy-risk. You can download a PDF of your answers first.",
+      "Submit for screening uses the web-search agent. It scores the form and checks public patents, products, and news for novelty, prior disclosure, and competitor copy-risk. You can download a PDF of your answers first.",
     inventorsTitle: "Name, address, residency, and nationality of each contributor",
     inventorsHint:
       "List original inventors — people who conceived the idea. Reduction to practice alone does not make someone an inventor. When in doubt, list the contributor and confirm with counsel.",
@@ -178,6 +176,8 @@ export const messages = {
     reviewTitle: "Patent Submission Review",
     reviewBody:
       "Each score is tagged at the top. Each reason is a bullet tagged with where it came from: AI agent, AI agent with web search, or local rules. Public disclosure is scored so that a cleaner confidentiality record ranks higher.",
+    weightOfOverall: (n: number) => `${n}% of overall`,
+    weightsNote: "Overall is a weighted average of these six scores.",
     localRules: "Local rules",
     aiAgentWeb: "AI agent · web search",
     aiAgent: "AI agent",
@@ -190,6 +190,7 @@ export const messages = {
       competitor: "Will a competitor want to copy it",
     } as Record<string, string>,
     apiError: "Could not reach the scoring API.",
+    scoringFailed: "Screening failed. The AI agent must score every category. Local rules were not used.",
   },
   es: {
     language: "Idioma",
@@ -218,7 +219,7 @@ export const messages = {
     ],
     whenUsed: "Cuándo se usa",
     whenUsedBody:
-      "Desde el inicio de la idea — antes del patrocinio ejecutivo, de un consultor de patentes y de un abogado de patentes. La asesoría jurídica revisa ideas que ya superaron las etapas 1 a 3. El objetivo es dedicar tiempo legal a ideas preevaluadas, no a cada envío.",
+      "Envíe una divulgación confidencial de invención. El agente la evalúa y indica si debe reforzar la idea, reunir más evidencia o pasar a patrocinio ejecutivo.",
     stages: [
       {
         n: "01",
@@ -289,17 +290,16 @@ export const messages = {
     loading: "Cargando…",
     noPatents: "Aún no hay patentes",
     noPatentsBody: "Las patentes creadas en este navegador aparecen aquí con su ID.",
-    adminTitle: "Acceso de administrador",
-    adminUsername: "Usuario",
-    adminPassword: "Contraseña",
-    adminSignIn: "Entrar",
-    adminInvalid: "El usuario o la contraseña no son correctos.",
     adminClose: "Cerrar",
-    openAdmin: "Acceso de administrador",
+    openAdmin: "Entrar al modo administrador",
     returnToUser: "Volver al modo de usuario",
+    enterAdminTitle: "¿Convertirse en administrador?",
+    enterAdminConfirm: "Entrar al modo administrador",
+    enterAdminCancel: "Cancelar",
     exitAdminTitle: "¿Salir del modo administrador?",
     exitAdminConfirm: "Salir del modo administrador",
     exitAdminStay: "Seguir como administrador",
+    fraudExample: "Detección de fraude conectado",
     loadingDraft: "Cargando su borrador…",
     saved: "Guardado",
     draftSaved: "Borrador guardado en este dispositivo",
@@ -310,7 +310,6 @@ export const messages = {
     downloadPdf: "Descargar PDF",
     submitScreening: "Enviar a evaluación",
     scoring: "Evaluando…",
-    submitWeb: "Enviar con búsqueda web",
     searchingScoring: "Buscando y evaluando…",
     yes: "Sí",
     no: "No",
@@ -322,7 +321,7 @@ export const messages = {
     typedSignature: "Escriba su nombre como firma",
     date: "Fecha",
     affirmationHint:
-      "Enviar a evaluación usa solo el formulario. Enviar con búsqueda web también revisa patentes, productos y noticias públicas para novedad, divulgación previa y riesgo de copia. Puede descargar un PDF de sus respuestas primero.",
+      "Enviar a evaluación usa el agente con búsqueda web. Puntúa el formulario y revisa patentes, productos y noticias públicas para novedad, divulgación previa y riesgo de copia. Puede descargar un PDF de sus respuestas primero.",
     inventorsTitle: "Nombre, dirección, residencia y nacionalidad de cada contribuyente",
     inventorsHint:
       "Liste a los inventores originales: quienes concibieron la idea. La mera reducción a la práctica no hace inventor a alguien. En caso de duda, incluya a la persona y confirme con la asesoría jurídica.",
@@ -365,6 +364,8 @@ export const messages = {
     reviewTitle: "Revisión de la solicitud de patente",
     reviewBody:
       "Cada puntuación está etiquetada arriba. Cada motivo es una viñeta con su origen: agente de IA, agente de IA con búsqueda web o reglas locales. La divulgación pública se puntúa de modo que un mejor registro de confidencialidad reciba una calificación más alta.",
+    weightOfOverall: (n: number) => `${n}% del total`,
+    weightsNote: "La puntuación general es un promedio ponderado de estas seis puntuaciones.",
     localRules: "Reglas locales",
     aiAgentWeb: "Agente de IA · búsqueda web",
     aiAgent: "Agente de IA",
@@ -377,6 +378,8 @@ export const messages = {
       competitor: "Si un competidor querría copiarla",
     } as Record<string, string>,
     apiError: "No se pudo contactar la API de evaluación.",
+    scoringFailed:
+      "La evaluación falló. El agente de IA debe puntuar cada categoría. No se usaron reglas locales.",
   },
 } as const;
 

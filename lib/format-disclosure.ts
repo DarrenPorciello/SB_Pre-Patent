@@ -18,12 +18,10 @@ function formatAnswer(question: Question, raw: string | string[] | undefined): s
   return value;
 }
 
-export function formatDisclosureForAgent(state: DisclosureState, webSearch = false): string {
+export function formatDisclosureForAgent(state: DisclosureState): string {
   const lines: string[] = [
     "Score this invention disclosure.",
-    webSearch
-      ? "Reply with JSON only. Each factor rationale must be an array of short bullet objects: {\"text\":\"...\",\"source\":\"web-search\"|\"ai-agent\"|\"local-rules\"}. Use web-search only for novelty, prior public disclosure, and competitor copy-risk."
-      : "Reply with JSON only. Each factor rationale must be an array of short bullet objects: {\"text\":\"...\",\"source\":\"ai-agent\"}. Do not use web search.",
+    "Reply with JSON only. Score every factor. Each factor rationale must be an array of short bullet objects: {\"text\":\"...\",\"source\":\"web-search\"|\"ai-agent\"}. Use web-search only for novelty, prior public disclosure, and competitor copy-risk.",
     "",
   ];
 

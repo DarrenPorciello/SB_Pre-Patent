@@ -6,6 +6,7 @@ import type {
   ScreeningResult,
 } from "./types";
 import { pointsFromText } from "./rationale";
+import { FACTOR_WEIGHTS } from "./weights";
 
 function text(answers: Answers, id: string): string {
   const value = answers[id];
@@ -317,17 +318,8 @@ export function scoreDisclosureApplication(state: DisclosureState): ScreeningRes
     scoreCompetitor(answers),
   ];
 
-  const weights: Record<string, number> = {
-    novelty: 0.24,
-    development: 0.14,
-    disclosure: 0.22,
-    revenue: 0.16,
-    reputation: 0.1,
-    competitor: 0.14,
-  };
-
   let overallScore = factors.reduce(
-    (sum, factor) => sum + factor.score * (weights[factor.id] ?? 0),
+    (sum, factor) => sum + factor.score * (FACTOR_WEIGHTS[factor.id] ?? 0),
     0,
   );
 
